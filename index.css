@@ -1,0 +1,79 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+header h1 {
+    margin: 0;
+}
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+.intro {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.intro h2 {
+    margin: 0;
+}
+.intro p {
+    font-size: 1.2em;
+}
+.social-links {
+    text-align: center;
+    margin: 20px 0;
+}
+.social-links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #333;
+}
+.projects {
+    margin: 40px 0;
+}
+.projects h3 {
+    text-align: center;
+    font-size: 2em;
+    color: #444;
+    margin-bottom: 20px;
+}
+.project-item {
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.project-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+.project-item h4 {
+    margin-top: 0;
+    color: #333;
+}
+.project-item p {
+    color: #666;
+    line-height: 1.6;
+}
+.project-item a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007BFF;
+    text-decoration: none;
+    font-weight: bold;
+}
+.project-item a:hover {
+    text-decoration: underline;
+}
