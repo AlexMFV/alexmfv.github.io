@@ -1,54 +1,87 @@
-function calcAge(b) {
-    const d = new Date(b);
-    const t = new Date();
-    let a = t.getFullYear() - d.getFullYear();
-    const m = t.getMonth() - d.getMonth();
-    if (m < 0 || (m === 0 && t.getDate() < d.getDate())) {
-        a--;
-    }
-    return a;
-}
-document.getElementById('age').textContent = calcAge(atob('MjAwMC0xMi0wNA=='));
+document.addEventListener('DOMContentLoaded', () => {
+    // Hamburger menu
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
 
-async function loadProjects() {
-    try {
-        const response = await fetch('https://api.github.com/users/alexmfv/repos');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const repos = await response.json();
-        const projectsContainer = document.getElementById('projects-container');
-        repos.forEach(async repo => {
-            try {
-                const commitsResponse = await fetch(repo.commits_url.replace('{/sha}', ''));
-                if (!commitsResponse.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const commits = await commitsResponse.json();
-                const projectItem = document.createElement('div');
-                projectItem.className = 'project-item';
-                projectItem.innerHTML = `
-                    <h4>${repo.name}</h4>
-                    <p>${repo.description || 'No description available.'}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <a href="${repo.html_url}" target="_blank">
-                            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" style="width: 20px; height: 20px; margin-right: 10px;">
-                        </a>
-                        <div style="display: flex; gap: 10px;">
-                            <p>⭐ Stars: ${repo.stargazers_count}</p>
-                            <p>🍴 Forks: ${repo.forks_count}</p>
-                            <p>🔄 Commits: ${commits.length}</p>
-                        </div>
-                    </div>
-                `;
-                projectsContainer.appendChild(projectItem);
-            } catch (error) {
-                console.error('Failed to fetch commits:', error);
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
+    }));
+
+    // API data fetching
+    const projectsContainer = document.getElementById('projects-container');
+    const apiUrl = 'http://localhost:3000/api/github'; // Replace with your actual API URL
+
+    async function fetchProjects() {
+        if (!projectsContainer) return;
+        showLoadingIndicator();
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
-    } catch (error) {
-        console.error('Failed to fetch repos:', error);
-    }
-}
+            const projects = await response.json();
+            renderProjects(projects);
 
-loadProjects();
+            // After fetching projects, find alexmfv.github.io and render its commits
+            const alexmfvRepo = projects.find(repo => repo.name === 'alexmfv.github.io');
+            if (alexmfvRepo && alexmfvRepo.commits) {
+                renderCommits(alexmfvRepo.commits);
+            } else {
+                commitsContainer.innerHTML = `<p class="error-message">Commits for alexmfv.github.io not found.</p>`;
+            }
+
+        } catch (error) {
+            showErrorMessage('Could not fetch projects. Is the API server running?');
+            commitsContainer.innerHTML = `<p class="error-message">Could not fetch commits. Is the API server running?</p>`;
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // This function will now be called from within fetchProjects
+    async function fetchCommits() {
+        // No longer needed as commits are fetched with projects
+    }
+
+    function renderCommits(commits) {
+        commitsContainer.innerHTML = '';
+        if (!commits || commits.length === 0) {
+            commitsContainer.innerHTML = `<p class="error-message">No commits to display.</p>`;
+            return;
+        }
+
+        commits.slice(0, 5).forEach(commit => {
+            const listItem = document.createElement('li');
+            listItem.className = 'commit-item';
+
+            const commitDate = new Date(commit.date);
+            const dateString = commitDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+            const timeSince = timeAgo(commit.date);
+            let badgeText = '';
+            if (timeSince.includes('day')) {
+                badgeText = 'day';
+            } else if (timeSince.includes('week')) {
+                badgeText = 'week';
+            }
+
+            listItem.innerHTML = `
+                <img src="${commit.author.avatar_url}" alt="${commit.author.name}" class="commit-avatar">
+                <div class="commit-details">
+                    <p class="commit-message">${commit.message}</p>
+                    <div class="commit-info">
+                        <span class="commit-date">${dateString}</span>
+                        ${badgeText ? `<span class="commit-badge">${badgeText}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            commitsContainer.appendChild(listItem);
+        });
+    }
+
+    fetchProjects();
+    setInterval(fetchProjects, 5 * 60 * 1000); // Refresh every 5 minutes
