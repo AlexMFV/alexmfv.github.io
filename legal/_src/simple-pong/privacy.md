@@ -90,3 +90,5 @@ If we update Simple Pong! in a way that changes how data is handled (for example
 Questions or requests about this policy: **alexmfv1@gmail.com**.
 
 Alexandre Valente, publisher of Simple Pong! (LittleFriars).
+
+Related pages: [Terms and Conditions](terms.html)

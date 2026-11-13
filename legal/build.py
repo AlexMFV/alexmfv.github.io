@@ -35,6 +35,7 @@ PROJECTS = {
         "contact": "alexmfv1@gmail.com",
         "docs": [
             ("privacy", "Privacy Policy", "What Simple Pong! collects, why, and your rights"),
+            ("terms", "Terms and Conditions", "The rules and terms for using Simple Pong!"),
         ],
     },
 }
