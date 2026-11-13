@@ -29,6 +29,14 @@ PROJECTS = {
             ("delete-account", "Delete your account", "How to delete your account and data, with or without the app"),
         ],
     },
+    "simple-pong": {
+        "name": "Simple Pong!",
+        "lead": "Classic arcade Pong with single-player and local two-player modes.",
+        "contact": "alexmfv1@gmail.com",
+        "docs": [
+            ("privacy", "Privacy Policy", "What Simple Pong! collects, why, and your rights"),
+        ],
+    },
 }
 
 HEAD = """<meta charset="UTF-8">
@@ -166,6 +174,7 @@ def build():
     problems = []
     for key, project in PROJECTS.items():
         out_dir = ROOT / key
+        out_dir.mkdir(parents=True, exist_ok=True)
         src_dir = ROOT / "_src" / key
         cards = []
         for doc, title, desc in project["docs"]:
@@ -173,7 +182,7 @@ def build():
             if not source.exists():
                 problems.append(f"missing {source}")
                 continue
-            text = source.read_text()
+            text = source.read_text(encoding="utf-8")
             for n, line in enumerate(text.splitlines(), 1):
                 if "[CONFIRM" in line:
                     problems.append(f"{source.name}:{n}: {line.strip()[:120]}")
@@ -197,7 +206,7 @@ def build():
 {markdown(lines)}
         </article>"""
             crumbs = f'<a href="../">Legal</a> › <a href="./">{project["name"]}</a> › {html.escape(title)}'
-            (out_dir / f"{doc}.html").write_text(page(f"{title} · {project['name']}", f"{project['name']} {title}", crumbs, body))
+            (out_dir / f"{doc}.html").write_text(page(f"{title} · {project['name']}", f"{project['name']} {title}", crumbs, body), encoding="utf-8")
             cards.append(f"""            <li><a class="card" href="{doc}.html">
                 <span><span class="title">{html.escape(title)}</span><span class="desc">{html.escape(desc)}</span></span>
                 <span class="arrow" aria-hidden="true">›</span>
@@ -211,7 +220,7 @@ def build():
         </ul>
         <p class="contact">Questions, requests or reports: <a href="mailto:{project['contact']}">{project['contact']}</a></p>"""
         crumbs = f'<a href="../">Legal</a> › {project["name"]}'
-        (out_dir / "index.html").write_text(page(f"{project['name']} · Legal", f"Legal documents for {project['name']}.", crumbs, body))
+        (out_dir / "index.html").write_text(page(f"{project['name']} · Legal", f"Legal documents for {project['name']}.", crumbs, body), encoding="utf-8")
     if problems:
         print("Not built cleanly:\n  " + "\n  ".join(problems))
         sys.exit(1)
